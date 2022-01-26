@@ -1,44 +1,44 @@
-import { transport } from '@coolwallet/core';
-export type Transport = transport.default;
+import { Transport } from '@coolwallet/core';
 
-export type signTxType = {
+export enum MajorType {
+  Uint = 0,
+  Byte = 2,
+  Array = 4,
+}
+
+export type Integer = string | number;
+
+export interface Options {
   transport: Transport;
   appPrivateKey: string;
   appId: string;
-  scriptType: ScriptType;
-  invalidHereafter: number;
-  input: Input;
-  output: Output;
-  change: Change;
-  fee: string;
   confirmCB?: Function;
   authorizedCB?: Function;
-};
+}
 
-export type Input = {
-  addressIndex: number;
-  utxos: [Utxo];
-  pubkeyBuf?: Buffer;
-};
+export interface Signer {
+  rolePath: number;
+  indexPath: number;
+}
 
-export type Utxo = {
-  preTxHash: string;
-  preIndex: number;
-};
+export interface Input {
+  txId: string;
+  index: Integer;
+}
 
-export type Output = {
-  value: string;
+export interface Output {
   address: string;
-};
+  amount: Integer;
+}
 
-export type Change = {
-  value: string;
-  addressIndex: number;
-  pubkeyBuf: Buffer;
-};
+export interface TransferWithoutFee {
+  signers: Signer[];
+  inputs: Input[];
+  output: Output;
+  change?: Output;
+  ttl: Integer;
+}
 
-export enum ScriptType {
-  P2PKH = 0,
-  P2SH = 1,
-  P2POINTER = 2,
+export interface Transfer extends TransferWithoutFee {
+  fee: Integer;
 }

@@ -1,30 +1,26 @@
 import { utils, config } from '@coolwallet/core';
-import { signTxType } from '../config/types';
+import { Output, Transfer } from '../config/types';
 import { handleHex } from './stringUtil';
 import { decodeAddress } from './index';
 
-export const getPath = (roleIndex?: number, addressIndex?: number) => {
+const getFullPath = (roleIndex: number, addressIndex: number) => {
   var pathString = "1852'/1815'/0'";
-  if (roleIndex !== undefined && roleIndex !== null) {
-    pathString = pathString + '/' + roleIndex;
-  }
-  if (addressIndex !== undefined && addressIndex !== null) {
+  pathString = pathString + '/' + roleIndex;
     pathString = pathString + '/' + addressIndex;
-  }
   return utils.getFullPath({
     pathType: config.PathType.BIP32ED25519,
     pathString: pathString,
   });
 };
 
-export const getPaymentArgument = async (signTxData: signTxType): Promise<string> => {
-  const SEPath = `15${await getPath(0, signTxData.input.addressIndex)}`;
-  let inputs = (80 + signTxData.input.utxos.length).toString(16);
-  for (const utxo of signTxData.input.utxos) {
-    inputs = inputs + '825820';
-    inputs = inputs + utxo.preTxHash;
-    inputs = inputs + utxo.preIndex;
-  }
+const getOutputArgument = (output: Output) => {
+  const argument = '';
+};
+
+export const getTransferArgument = (
+  transaction: Transfer
+): string[] => {
+  const { signers, inputs, output, change, fee, ttl } = transaction;
 
   const argument =
     signTxData.change.pubkeyBuf.toString('hex') +
@@ -39,7 +35,15 @@ export const getPaymentArgument = async (signTxData: signTxType): Promise<string
     signTxData.invalidHereafter.toString(16).padStart(16, '0') +
     inputs;
 
-  return SEPath + argument;
+  const fullArguments = signers.map((signer) => {
+    const { rolePath, indexPath } = signer;
+    const fullPath = utils.getFullPath({
+      pathType: config.PathType.BIP32ED25519,
+      pathString: `1852'/1815'/0'/${rolePath}/${indexPath}`,
+    });
+    return `15${fullPath}${argument}`;
+  });
+  return fullArguments;
 };
 
 export const getPrefix = (input: string): string => {

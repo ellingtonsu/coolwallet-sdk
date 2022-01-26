@@ -1,10 +1,14 @@
 import { apdu, tx } from '@coolwallet/core';
-import { signTxType } from './config/types';
+import { Options, Transfer } from './config/types';
 import * as scriptUtil from './utils/scriptUtil';
 import * as params from './config/params';
 
-export async function signTransaction(signTxData: signTxType): Promise<string> {
-  const { scriptType: redeemScriptType, transport, appId, appPrivateKey, confirmCB, authorizedCB } = signTxData;
+export async function signTransaction(
+  transaction: Transfer,
+  options: Options,
+): Promise<string> {
+  const { transport, appPrivateKey, appId, confirmCB, authorizedCB } = options;
+  const { inputs, output, change, fee, ttl } = transaction;
 
   const preActions = [];
 
@@ -14,7 +18,7 @@ export async function signTransaction(signTxData: signTxType): Promise<string> {
   };
   preActions.push(sendScript);
 
-  const argument = await scriptUtil.getPaymentArgument(signTxData);
+  const argument = await scriptUtil.getTransferArgument(transaction);
   const sendArgument = async () => {
     await apdu.tx.executeScript(transport, appId, appPrivateKey, argument);
   };
@@ -28,8 +32,8 @@ export async function signTransaction(signTxData: signTxType): Promise<string> {
     authorizedCB,
     false
   );
-  // TODO
-  const transaction = Buffer.from('', 'hex');
+
+  const signedTx = '';
   //const transaction = txUtil.composeFinalTransaction(redeemScriptType, preparedData, signatures as Buffer[]);
-  return transaction.toString('hex');
+  return signedTx;
 }

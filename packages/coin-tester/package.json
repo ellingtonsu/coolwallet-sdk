@@ -7,6 +7,7 @@
     "serve": "vite preview"
   },
   "dependencies": {
+    "@coolwallet/ada": "file:../coin-ada",
     "@coolwallet/core": "file:../core",
     "@coolwallet/template": "file:../coin-template",
     "@coolwallet/transport-web-ble": "file:../transport-web-ble",
