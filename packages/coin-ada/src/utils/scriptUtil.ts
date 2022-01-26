@@ -1,20 +1,21 @@
 import { utils, config } from '@coolwallet/core';
 import { Output, Transfer } from '../config/types';
 import { handleHex } from './stringUtil';
-import { decodeAddress } from './index';
+import { decodeAddress } from './transactionUtil';
 
-const getFullPath = (roleIndex: number, addressIndex: number) => {
-  var pathString = "1852'/1815'/0'";
-  pathString = pathString + '/' + roleIndex;
-    pathString = pathString + '/' + addressIndex;
-  return utils.getFullPath({
+const getFullPath = (rolePath: number, indexPath: number) => {
+  const fullPath = utils.getFullPath({
     pathType: config.PathType.BIP32ED25519,
-    pathString: pathString,
+    pathString: `1852'/1815'/0'/${rolePath}/${indexPath}`,
   });
+  return fullPath;
 };
 
 const getOutputArgument = (output: Output) => {
+  const addressBuff = decodeAddress(output.address);
+  const addressLength = addressBuff.length;
   const argument = '';
+
 };
 
 export const getTransferArgument = (
@@ -37,10 +38,7 @@ export const getTransferArgument = (
 
   const fullArguments = signers.map((signer) => {
     const { rolePath, indexPath } = signer;
-    const fullPath = utils.getFullPath({
-      pathType: config.PathType.BIP32ED25519,
-      pathString: `1852'/1815'/0'/${rolePath}/${indexPath}`,
-    });
+    const fullPath = getFullPath(rolePath, indexPath);
     return `15${fullPath}${argument}`;
   });
   return fullArguments;
