@@ -31,6 +31,11 @@ export interface Output {
   amount: Integer;
 }
 
+export interface Witness {
+  vkey: string;
+  signature: string;
+}
+
 export interface TransferWithoutFee {
   signers: Signer[];
   inputs: Input[];

@@ -34,7 +34,8 @@ export {
   genInputs,
   genOutputs,
   genFee,
-  genTtl
+  genTtl,
+  genFakeWitness,
 } from './transactionUtil';
 
 export {

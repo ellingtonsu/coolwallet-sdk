@@ -8,6 +8,7 @@ import {
   genOutputs,
   genFee,
   genTtl,
+  genFakeWitness,
 } from './utils';
 import { signTransaction } from './sign';
 import type { Options, TransferWithoutFee, Transfer } from './config/types';
@@ -37,12 +38,14 @@ export default class ADA implements COIN.Coin {
   }
 
   getTransactionSize(transaction: TransferWithoutFee): number {
-    const { inputs, output, change, ttl } = transaction;
+    const { signers, inputs, output, change, ttl } = transaction;
     let tx = '83a4';
     tx += genInputs(inputs);
     tx += genOutputs(output, change);
     tx += genFee();
     tx += genTtl(ttl);
+    tx += genFakeWitness(signers);
+    tx += 'f6';
     console.log('tx :', tx);
     return tx.length / 2;
   }

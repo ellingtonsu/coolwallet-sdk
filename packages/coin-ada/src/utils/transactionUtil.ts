@@ -1,6 +1,6 @@
 import { bech32 } from 'bech32';
 import { BigNumber } from '@ethersproject/bignumber';
-import { MajorType, Integer, Input, Output } from '../config/types';
+import { MajorType, Signer, Integer, Input, Output } from '../config/types';
 
 export const decodeAddress = (address: string): Buffer => {
   const words = bech32.decode(address, 150).words;
@@ -70,9 +70,17 @@ export const genFee = (value = 170000): string => {
   return result;
 };
 
-export const genTtl = (value: Integer = 0): string => {
+export const genTtl = (value: Integer): string => {
   let result = '03';
   result += cborEncode(MajorType.Uint, value);
   return result;
 };
 
+export const genFakeWitness = (signers: Signer[]): string => {
+  let result = 'a100' + cborEncode(MajorType.Array, signers.length);
+  for (let signer of signers) {
+    result += '825820' + '0'.repeat(64);
+    result += '5840' + '0'.repeat(128);
+  }
+  return result;
+};
