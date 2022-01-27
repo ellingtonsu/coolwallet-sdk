@@ -10,28 +10,30 @@ export async function signTransaction(
   const { transport, appPrivateKey, appId, confirmCB, authorizedCB } = options;
   const { inputs, output, change, fee, ttl } = transaction;
 
-  const preActions = [];
-
   const script = params.TRANSFER.script + params.TRANSFER.signature;
-  const sendScript = async () => {
+  const args = await getTransferArgument(transaction);
+
+  const encryptedSigs = [];
+  for (let arg of args) {
     await apdu.tx.sendScript(transport, script);
-  };
-  preActions.push(sendScript);
+    const sig = await apdu.tx.executeScript(transport, appId, appPrivateKey, arg);
+    encryptedSigs.push(sig);
+  }
 
-  const fullArguments = await getTransferArgument(transaction);
-  const sendArgument = async () => {
-    await apdu.tx.executeScript(transport, appId, appPrivateKey, argument);
-  };
+  await apdu.tx.finishPrepare(transport);
+  await apdu.tx.getTxDetail(transport);
+  const decryptingKey = await apdu.tx.getSignatureKey(transport);
 
-  const signatures = await tx.flow.getSingleSignatureFromCoolWallet(
-    transport,
-    preActions,
-    sendArgument,
-    false,
-    confirmCB,
-    authorizedCB,
-    false
-  );
+  let sigs = [];
+  for (let encryptedSig of encryptedSigs) {
+    if (!encryptedSig) throw new Error('encryptedSig is invalid');
+    const sig = tx.util.decryptSignatureFromSE(encryptedSig, decryptingKey);
+    sigs.push(sig);
+  }
+
+  await apdu.tx.clearTransaction(transport);
+  await apdu.mcu.control.powerOff(transport);
+
 
   const signedTx = '';
   //const transaction = txUtil.composeFinalTransaction(redeemScriptType, preparedData, signatures as Buffer[]);
