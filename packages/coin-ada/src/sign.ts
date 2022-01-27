@@ -1,6 +1,6 @@
 import { apdu, tx } from '@coolwallet/core';
 import { Options, Transfer } from './config/types';
-import * as scriptUtil from './utils/scriptUtil';
+import { getTransferArgument } from './utils';
 import * as params from './config/params';
 
 export async function signTransaction(
@@ -18,7 +18,7 @@ export async function signTransaction(
   };
   preActions.push(sendScript);
 
-  const argument = await scriptUtil.getTransferArgument(transaction);
+  const fullArguments = await getTransferArgument(transaction);
   const sendArgument = async () => {
     await apdu.tx.executeScript(transport, appId, appPrivateKey, argument);
   };

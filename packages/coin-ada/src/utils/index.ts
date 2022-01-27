@@ -36,3 +36,7 @@ export {
   genFee,
   genTtl
 } from './transactionUtil';
+
+export {
+  getTransferArgument
+} from './scriptUtil';
