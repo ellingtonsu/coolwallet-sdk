@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@coolwallet/ada": "file:../coin-ada",
+    "@coolwallet/coin-cro": "file:../coin-cro",
     "@coolwallet/core": "file:../core",
     "@coolwallet/template": "file:../coin-template",
     "@coolwallet/transport-web-ble": "file:../transport-web-ble",
@@ -32,7 +33,8 @@
     "secp256k1": "^4.0.2",
     "stream": "npm:readable-stream@^3.6.0",
     "util": "^0.12.4",
-    "vite": "^2.7.4"
+    "vite": "^2.7.4",
+    "web3": "1.2.2"
   },
   "devDependencies": {
     "@types/react": "^17.0.0",
