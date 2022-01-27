@@ -36,10 +36,10 @@ export const cborEncode = (majorType: MajorType, value: Integer): string => {
 
 export const genInputs = (inputs: Input[]): string => {
   let result = '00' + cborEncode(MajorType.Array, inputs.length);
-  for (let input of inputs) {
-    result += '825820';
-    result += input.txId;
-    result += cborEncode(MajorType.Uint, input.index);
+  for (let { txId, index } of inputs) {
+    txId = txId.startsWith('0x') ? txId.substr(2) : txId;
+    if (txId.length != 64) throw new Error('txId length is invalid');
+    result += '825820' + txId + cborEncode(MajorType.Uint, index);
   }
   return result;
 };
@@ -64,7 +64,7 @@ export const genOutputs = (output: Output, change?: Output): string => {
   return result;
 };
 
-export const genFee = (value = 0): string => {
+export const genFee = (value = 170000): string => {
   let result = '02';
   result += cborEncode(MajorType.Uint, value);
   return result;

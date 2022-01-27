@@ -9,8 +9,9 @@ import {
   genFee,
   genTtl,
 } from './utils';
-import { Options, TransferWithoutFee, Transfer } from './config/types';
 import { signTransaction } from './sign';
+import type { Options, TransferWithoutFee, Transfer } from './config/types';
+export type { Options, TransferWithoutFee, Transfer };
 
 export default class ADA implements COIN.Coin {
 
