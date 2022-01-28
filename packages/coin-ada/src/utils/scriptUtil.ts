@@ -1,6 +1,11 @@
 import { utils, config } from '@coolwallet/core';
-import { MajorType, Integer, Output, Transfer } from '../config/types';
-import { decodeAddress, cborEncode } from './index';
+import { MajorType, Integer, Output, Witness, Transfer } from '../config/types';
+import {
+  derivePubKeyFromAccountToIndex,
+  decodeAddress,
+  cborEncode,
+  genInputs,
+} from './index';
 
 const getFullPath = (rolePath: number, indexPath: number) => {
   const fullPath = utils.getFullPath({
@@ -26,21 +31,30 @@ const getOutputArgument = (output?: Output) => {
 };
 
 export const getTransferArgument = (
-  transaction: Transfer
-): string[] => {
+  transaction: Transfer,
+  accPubkey: string,
+): Witness[] => {
   const { signers, inputs, output, change, fee, ttl } = transaction;
+  const accPubkeyBuff = Buffer.from(accPubkey, 'hex');
 
   const argument = getOutputArgument(change)
     + getOutputArgument(output)
     + getUintArgument(fee)
-    + getUintArgument(ttl);
+    + getUintArgument(ttl)
+    + genInputs(inputs);
 
-  const fullArguments = signers.map((signer) => {
+  const witnesses = signers.map((signer) => {
     const { rolePath, indexPath } = signer;
+    const vkey = derivePubKeyFromAccountToIndex(
+      accPubkeyBuff,
+      rolePath,
+      indexPath
+    ).toString('hex');
+    const sig = '';
     const fullPath = getFullPath(rolePath, indexPath);
-    return `15${fullPath}${argument}`;
+    return { arg: `15${fullPath}${argument}`, vkey, sig };
   });
 
-  return fullArguments;
+  return witnesses;
 };
 

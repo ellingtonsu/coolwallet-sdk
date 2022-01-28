@@ -32,8 +32,9 @@ export interface Output {
 }
 
 export interface Witness {
+  arg: string;
   vkey: string;
-  signature: string;
+  sig: string;
 }
 
 export interface TransferWithoutFee {

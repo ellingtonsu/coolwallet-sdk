@@ -1,38 +1,15 @@
 import { bech32 } from 'bech32';
-import { BigNumber } from '@ethersproject/bignumber';
-import { MajorType, Signer, Integer, Input, Output } from '../config/types';
-
-export const decodeAddress = (address: string): Buffer => {
-  const words = bech32.decode(address, 150).words;
-  const addressBuff = Buffer.from(bech32.fromWords(words));
-  return addressBuff;
-};
-
-export const cborEncode = (majorType: MajorType, value: Integer): string => {
-  const bn = BigNumber.from(value);
-
-  let prefix = majorType << 5;
-  let argument = '';
-  if (bn.gt('0xffffffffffffffff')) {
-    throw new Error('value is over support');
-  } else if (bn.gt('0xffffffff')) {
-    prefix += 27;
-    argument = bn.toHexString().substr(2).padStart(16, '0');
-  } else if (bn.gt('0xffff')) {
-    prefix += 26;
-    argument = bn.toHexString().substr(2).padStart(8, '0');
-  } else if (bn.gt('0xff')) {
-    prefix += 25;
-    argument = bn.toHexString().substr(2);
-  } else if (bn.gte('0x18')) {
-    prefix += 24;
-    argument = bn.toHexString().substr(2);
-  } else {
-    prefix += bn.toNumber();
-  }
-  const result = prefix.toString(16).padStart(2, '0') + argument;
-  return result;
-};
+import { decodeAddress, cborEncode } from './index';
+import {
+  MajorType,
+  Signer,
+  Integer,
+  Input,
+  Output,
+  Witness,
+  Transfer,
+  TransferWithoutFee
+} from '../config/types';
 
 export const genInputs = (inputs: Input[]): string => {
   let result = '00' + cborEncode(MajorType.Array, inputs.length);
@@ -64,7 +41,7 @@ export const genOutputs = (output: Output, change?: Output): string => {
   return result;
 };
 
-export const genFee = (value = 170000): string => {
+export const genFee = (value: Integer): string => {
   let result = '02';
   result += cborEncode(MajorType.Uint, value);
   return result;
@@ -83,4 +60,29 @@ export const genFakeWitness = (signers: Signer[]): string => {
     result += '5840' + '0'.repeat(128);
   }
   return result;
+};
+
+export const genWitness = (witnesses: Witness[]): string => {
+  let result = 'a100' + cborEncode(MajorType.Array, witnesses.length);
+  for (let witness of witnesses) {
+    const { vkey, sig } = witness;
+    if (vkey.length != 64) throw new Error('vkey length is invalid');
+    if (sig.length != 128) throw new Error('signature length is invalid');
+    result += '825820' + vkey;
+    result += '5840' + sig;
+  }
+  return result;
+};
+
+export const genTransferTxBody = (data: Transfer | TransferWithoutFee) => {
+  let tx = 'a4';
+  tx += genInputs(data.inputs);
+  tx += genOutputs(data.output, data.change);
+  if (!(data as Transfer).fee) {
+    tx += genFee(170000);
+  } else {
+    tx += genFee((data as Transfer).fee);
+  }
+  tx += genTtl(data.ttl);
+  return tx;
 };

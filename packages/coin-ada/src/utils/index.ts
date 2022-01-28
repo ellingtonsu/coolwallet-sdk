@@ -1,8 +1,15 @@
+import { BigNumber } from '@ethersproject/bignumber';
+import { bech32 } from 'bech32';
+import { MajorType, Integer } from '../config/types';
+
 const bip32Edd25519 = require('bip32-ed25519');
 const blake2b = require('blake2b');
-import { bech32 } from 'bech32';
 
-export const derivePubKeyFromAccountToIndex = (accountPubKey: Buffer, roleIndex = 0, index = 0) => {
+export const derivePubKeyFromAccountToIndex = (
+  accountPubKey: Buffer,
+  roleIndex = 0,
+  index = 0
+): Buffer => {
   const rolePubKey = bip32Edd25519.derivePublic(accountPubKey, roleIndex);
   return bip32Edd25519.derivePublic(rolePubKey, index).slice(0, 32);
 };
@@ -28,14 +35,46 @@ export const accountKeyToAddress = (accPubkey: Buffer, addrIndex: number) => {
   return address;
 };
 
+export const decodeAddress = (address: string): Buffer => {
+  const words = bech32.decode(address, 150).words;
+  const addressBuff = Buffer.from(bech32.fromWords(words));
+  return addressBuff;
+};
+
+export const cborEncode = (majorType: MajorType, value: Integer): string => {
+  const bn = BigNumber.from(value);
+
+  let prefix = majorType << 5;
+  let argument = '';
+  if (bn.gt('0xffffffffffffffff')) {
+    throw new Error('value is over support');
+  } else if (bn.gt('0xffffffff')) {
+    prefix += 27;
+    argument = bn.toHexString().substr(2).padStart(16, '0');
+  } else if (bn.gt('0xffff')) {
+    prefix += 26;
+    argument = bn.toHexString().substr(2).padStart(8, '0');
+  } else if (bn.gt('0xff')) {
+    prefix += 25;
+    argument = bn.toHexString().substr(2);
+  } else if (bn.gte('0x18')) {
+    prefix += 24;
+    argument = bn.toHexString().substr(2);
+  } else {
+    prefix += bn.toNumber();
+  }
+  const result = prefix.toString(16).padStart(2, '0') + argument;
+  return result;
+};
+
 export {
-  decodeAddress,
-  cborEncode,
+  genTransferTxBody,
+  genFakeWitness,
+  genWitness,
   genInputs,
   genOutputs,
   genFee,
   genTtl,
-  genFakeWitness,
 } from './transactionUtil';
 
 export {
