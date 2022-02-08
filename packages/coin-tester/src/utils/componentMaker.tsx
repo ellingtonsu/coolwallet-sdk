@@ -13,7 +13,7 @@ export const NoInput = (input: {
     <Col xs={2}>
       {input.title}
     </Col>
-    <Col className='show-text-area'>
+    <Col xs={8} className='show-text-area'>
       {input.content}
     </Col>
     <Col xs={2}>
@@ -54,7 +54,7 @@ export const OneInput = (input: {
         placeholder={input.placeholder}
       />
     </Col>
-    <Col className='show-text-area'>
+    <Col xs={5} className='show-text-area'>
       {input.content}
     </Col>
     <Col xs={2}>

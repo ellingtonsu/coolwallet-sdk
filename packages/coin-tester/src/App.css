@@ -42,10 +42,11 @@
 }
 
 .show-text-area {
-	display: flex;
+	display: block;
 	align-items: center;
 	border-radius: 4px;
 	background: #808080;
+  word-wrap: break-word;
 	font-family: Arial, Helvetica, sans-serif;
 }
 
