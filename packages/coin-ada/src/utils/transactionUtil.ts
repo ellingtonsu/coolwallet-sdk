@@ -2,7 +2,6 @@ import { bech32 } from 'bech32';
 import { decodeAddress, cborEncode } from './index';
 import {
   MajorType,
-  Signer,
   Integer,
   Input,
   Output,
@@ -53,9 +52,12 @@ export const genTtl = (value: Integer): string => {
   return result;
 };
 
-export const genFakeWitness = (signers: Signer[]): string => {
-  let result = 'a100' + cborEncode(MajorType.Array, signers.length);
-  for (let signer of signers) {
+export const genFakeWitness = (addressIndexes: number[]): string => {
+  let result = 'a100' + cborEncode(
+    MajorType.Array,
+    addressIndexes.length
+  );
+  for (let index of addressIndexes) {
     result += '825820' + '0'.repeat(64);
     result += '5840' + '0'.repeat(128);
   }

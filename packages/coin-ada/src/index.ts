@@ -36,10 +36,10 @@ export default class ADA implements COIN.Coin {
   }
 
   getTransactionSize(transaction: TransferWithoutFee): number {
-    const { signers } = transaction;
+    const { addrIndexes } = transaction;
     let estimatedTx = '83'
       + genTransferTxBody(transaction)
-      + genFakeWitness(signers)
+      + genFakeWitness(addrIndexes)
       + 'f6';
     return estimatedTx.length / 2;
   }
@@ -49,7 +49,7 @@ export default class ADA implements COIN.Coin {
     options: Options
   ): Promise<string> {
     const { transport, appPrivateKey, appId, confirmCB, authorizedCB } = options;
-    const { signers, inputs, output, change, fee, ttl } = transaction;
+    const { inputs, output, change, fee, ttl } = transaction;
 
     // prepare data
 

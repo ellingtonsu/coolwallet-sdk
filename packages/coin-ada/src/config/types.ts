@@ -16,11 +16,6 @@ export interface Options {
   authorizedCB?: Function;
 }
 
-export interface Signer {
-  rolePath: number;
-  indexPath: number;
-}
-
 export interface Input {
   txId: string;
   index: Integer;
@@ -38,7 +33,7 @@ export interface Witness {
 }
 
 export interface TransferWithoutFee {
-  signers: Signer[];
+  addrIndexes: number[];
   inputs: Input[];
   output: Output;
   change?: Output;

@@ -34,7 +34,7 @@ export const getTransferArgument = (
   transaction: Transfer,
   accPubkey: string,
 ): Witness[] => {
-  const { signers, inputs, output, change, fee, ttl } = transaction;
+  const { addrIndexes, inputs, output, change, fee, ttl } = transaction;
   const accPubkeyBuff = Buffer.from(accPubkey, 'hex');
 
   const argument = getOutputArgument(change)
@@ -43,15 +43,14 @@ export const getTransferArgument = (
     + getUintArgument(ttl)
     + genInputs(inputs);
 
-  const witnesses = signers.map((signer) => {
-    const { rolePath, indexPath } = signer;
+  const witnesses = addrIndexes.map((addrIndex) => {
     const vkey = derivePubKeyFromAccountToIndex(
       accPubkeyBuff,
-      rolePath,
-      indexPath
+      0,
+      addrIndex
     ).toString('hex');
     const sig = '';
-    const fullPath = getFullPath(rolePath, indexPath);
+    const fullPath = getFullPath(0, addrIndex);
     return { arg: `15${fullPath}${argument}`, vkey, sig };
   });
 
