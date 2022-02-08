@@ -163,7 +163,7 @@ function CoinAda(props: Props) {
         disabled={disabled}
         btnName='Sign'
       />
-      <div className='title2'>2. Stake Register Tx</div>
+      <div className='title2'>2. Stake Register Tx (To be continued)</div>
     </Container>
   );
 }
