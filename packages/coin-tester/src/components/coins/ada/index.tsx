@@ -40,14 +40,14 @@ function CoinAda(props: Props) {
 
   // 1. Transfer Tx
   const [transferTxKeys, setTransferTxKeys] = useState([
-    'addrIndex',
-    'txId',
-    'utxoIndex',
-    'toAddr',
-    'amount',
-    'changeAddr',
-    'changeAmount',
-    'ttl',
+    'Address Index',
+    'Transaction ID',
+    'UTXO Index',
+    'To Address',
+    'To Amount',
+    'Change Address',
+    'Change Amount',
+    'Time to Live',
   ]);
   const [transferTxValues, setTransferTxValues] = useState([
     '0',
