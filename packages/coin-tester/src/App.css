@@ -39,6 +39,12 @@
 .function-component {
 	font-size: 22px;
 	margin-bottom: 12px;
+  min-height: 39px;
+}
+
+.input-title {
+	border-radius: 4px;
+	background: #383c44;
 }
 
 .show-text-area {

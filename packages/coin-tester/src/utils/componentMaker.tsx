@@ -54,7 +54,7 @@ export const OneInput = (input: {
         placeholder={input.placeholder}
       />
     </Col>
-    <Col xs={5} className='show-text-area'>
+    <Col className='show-text-area'>
       {input.content}
     </Col>
     <Col xs={2}>
@@ -124,3 +124,57 @@ export const TwoInputs = (input: {
     </Col>
   </Row>
 );
+
+export const ObjInputs = (input: {
+  title: string,
+  content: string,
+  onClick: () => void,
+  disabled: boolean,
+  btnName?: string,
+  keys: string[],
+  values: string[],
+  setValues: (values: string[]) => void,
+}): JSX.Element => (
+  <Row className='function-component'>
+    <Col xs={2}>
+      {input.title}
+    </Col>
+    <Col xs={8}>
+      {input.keys.map((key, i) => (
+        <Row key={i} className='function-component'>
+          <Col xs={3} className='input-title'>
+            {key}
+          </Col>
+          <Col xs={9}>
+            <Form.Control
+              value={input.values[i]}
+              onChange={(event) => {
+                const values = [...input.values];
+                values[i] = event.target.value;
+                input.setValues(values);
+              }}
+              placeholder={key}
+            />
+          </Col>
+        </Row>
+      ))}
+      <Row className='function-component'>
+        <Col className='show-text-area'>
+          {input.content}
+        </Col>
+      </Row>
+    </Col>
+    <Col xs={2}>
+      <ButtonGroup className='d-flex'>
+        <Button
+          disabled={input.disabled}
+          variant='outline-light'
+          onClick={input.onClick}
+        >
+          {input.btnName ?? 'Send'}
+        </Button>
+      </ButtonGroup>
+    </Col>
+  </Row>
+);
+
